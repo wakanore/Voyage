@@ -1,29 +1,34 @@
-from typing import List
+from sqlalchemy.orm import Session
+from typing import List, Annotated
 from fastapi import APIRouter, Depends
+from fastapi.security import APIKeyHeader
 from user import register
-#from models.database import get_db
-
-from dataclasses import dataclass
-
-from pydantic import BaseModel
-from pydantic.dataclasses import dataclass
 import schemas
 from fastapi import FastAPI, APIRouter, Path
-from schemas import Userr, User
+from schemas import  User
+from fastapi import HTTPException
 
 user_router = APIRouter(prefix = '/users', tags = ['Пользователи'])
+users =[]
 
 def get_db():
-    db = SessionLocal()
+    db = Session()
     try:
         yield db
     finally:
         db.close()
 
+def get_users(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(schemas.User).offset(skip).limit(limit).all()
 
-@user_router.get('/', name = 'get_users_all', response_model = List[Userr])
-def get_users_all():
+
+
+@user_router.get("/", response_model=List[schemas.User])
+def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    users = get_users(db, skip=skip, limit=limit)
     return users
+
+
 
 @user_router.post('/', name = 'add_user', response_model=User)
 def add_user(user: User):
@@ -51,10 +56,11 @@ def get_user_by_email(email: str):
             return user
     raise HTTPException(status_code = 404, detail = 'user not found')
 
-@user_router.post("", response_model=schemas.User, status_code=201)
-def register_user(user_data: schemas.UserCreate):
-    return register(db=db, user_data=user_data)
 
+
+@user_router.post("", response_model=schemas.User, status_code=201)
+def register_user(user_data: schemas.UserCreate, db: Session = Depends(get_db)):
+    return register(db=db, user_data=user_data)
 
 
 
