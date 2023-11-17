@@ -21,25 +21,40 @@ def get_db():
         db.close()
 
 
-@user_router.get('/', name = 'Вce пользователи', response_model = List[Userr])
-def get_all_users():
+@user_router.get('/', name = 'get_users_all', response_model = List[Userr])
+def get_users_all():
     return users
 
-@user_router.post('/', name = 'добавить пользователя', response_model=User)
-def create_user(user: User):
+@user_router.post('/', name = 'add_user', response_model=User)
+def add_user(user: User):
     users.append(user)
     return user
 
-@user_router.get('/{user_id}', name = 'Получить пользователя', response_model = User)
-def get_user(user_id: int):
+@user_router.get('/{user_id}', name = 'get_user_by_id', response_model = User)
+def get_user_by_id(user_id: int):
     for user in users:
         if user.id == user_id:
+            return user
+    raise HTTPException(status_code = 404, detail = 'user not found')
+
+@user_router.get('/{user_id}', name = 'get_user_by_username', response_model = User)
+def get_user_by_username(username: str):
+    for user in users:
+        if user.username == username:
+            return user
+    raise HTTPException(status_code = 404, detail = 'user not found')
+
+@user_router.get('/{user_id}', name = 'get_user_by_email', response_model = User)
+def get_user_by_email(email: str):
+    for user in users:
+        if user.email == email:
             return user
     raise HTTPException(status_code = 404, detail = 'user not found')
 
 @user_router.post("", response_model=schemas.User, status_code=201)
 def register_user(user_data: schemas.UserCreate):
     return register(db=db, user_data=user_data)
+
 
 
 
