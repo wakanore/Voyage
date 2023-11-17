@@ -8,28 +8,19 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
-    firstname = Column(String, unique=True, index=True)
-    lastname = Column(String, unique=True, index=True)
+    image = Column(String, unique=True, index=True)
+    age = Column(Integer, primary_key=True, index=True)
+    type = 'guest' or 'owner'
+    organization_time = Column(String, unique=True, index=True)
     register_time = Column(String, unique=True, index=True)
-    Hotel = Column(String, unique=True, index=True)
-    password = Column(String)
+
 
     items = relationship("Hotel", back_populates="owner")
     tokens = relationship("Room", back_populates="user")
 
-class Owner(Base):
-    __tablename__ = "owner"
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
-    firstname = Column(String, unique=True, index=True)
-    lastname = Column(String, unique=True, index=True)
-    register_time = Column(String, unique=True, index=True)
-    Hotel = Column(String, unique=True, index=True)
-    password = Column(String)
 
-    items = relationship("Hotel", back_populates="owner")
-    tokens = relationship("Room", back_populates="user")
 
 class Room(Base):
     __tablename__ = "rooms"
@@ -50,5 +41,6 @@ class Hotel(Base):
     room_count = Column(Integer, primary_key=True, index=True)
 
     user = relationship("Owner", back_populates="Hotel")
+
 
 
