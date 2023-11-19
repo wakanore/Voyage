@@ -18,7 +18,7 @@ def get_db():
         db.close()
 
 def get_users(db: Session):
-    return db.query(schemas.User).offset(skip).limit(limit).all()
+    return db.query(schemas.User)
 
 
 
@@ -60,6 +60,8 @@ def get_user_by_email(email: str):
 @user_router.post("/register_user/", response_model=schemas.User, status_code=201)
 def register_user(user_data: schemas.UserCreate, db: Session = Depends(get_db)):
     return register(db=db, user_data=user_data)
+
+
 
 
 
