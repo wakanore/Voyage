@@ -17,15 +17,18 @@ def get_db():
     finally:
         db.close()
 
-def get_users(db: Session):
-    return db.query(schemas.User)
+def get_users(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(schemas.User).offset(skip).limit(limit).all()
+
 
 
 
 @user_router.get("/read_users/", response_model=List[schemas.User])
-def read_users(db: Session = Depends(get_db)):
-    users = get_users(db)
+def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    users = get_users(db, skip=skip, limit=limit)
     return users
+
+
 
 
 
@@ -44,7 +47,7 @@ def get_user_by_id(user_id: int):
 @user_router.get('/get_user_by_username/', name = 'get_user_by_username', response_model = User)
 def get_user_by_username(username: str):
     for user in users:
-        if user.username == username:
+        if username in user.username:
             return user
     raise HTTPException(status_code = 404, detail = 'user not found')
 
@@ -58,7 +61,7 @@ def get_user_by_email(email: str):
 
 
 @user_router.post("/register_user/", response_model=schemas.User, status_code=201)
-def register_user(user_data: schemas.UserCreate, db: Session = Depends(get_db)):
+def register_user(user_data: schemas.User, db: Session = Depends(get_db)):
     return register(db=db, user_data=user_data)
 
 
