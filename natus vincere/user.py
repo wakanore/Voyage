@@ -2,8 +2,9 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette.status import HTTP_400_BAD_REQUEST
-
+from db import Base
 from model import User
+import datetime
 
 import random
 def uniqueid():
@@ -42,3 +43,16 @@ def register(db: Session, user_data: User):
         "age": user.age,
         "registrationTime": user.registrationTime
     }
+
+async def create_user(db: Session, user: User):
+    query = user.insert().values(
+        username=user.username,
+        email=user.email,
+        Image=user.Image,
+        type=user.type,
+        age=user.age,
+    )
+    user_id = await Base.execute(query)
+    registrationTime = await Base.execute(datetime.datetime.now())
+
+    return {**user.dict(), "id": user_id, "register_time": registrationTime}
