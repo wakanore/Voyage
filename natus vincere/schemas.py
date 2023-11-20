@@ -45,13 +45,11 @@ class Userr:
 class User(BaseModel):
     id: int
     username: str
-    firstname: str
-    lastname: str
+    emale: str
+    Image: str
+    type : str
+    if type:
+        organization_name: str
     age: int
-
-
-class UserCreate(BaseModel):
-    password: str
-
-
+    registrationTime: str
 
