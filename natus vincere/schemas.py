@@ -24,7 +24,7 @@ class Owner:
     id: int
     firstname:str
     lastname: str
-    emale: str
+    email: str
     password: str
     registerTime: str
     Hotels: Hotel
@@ -34,7 +34,7 @@ class Userr:
     id:int
     firstname: str
     lastname: str
-    emale: str
+    email: str
     password: str
     registerTime: str
     currentHotel: Hotel
@@ -45,7 +45,7 @@ class Userr:
 class User(BaseModel):
     id: int
     username: str
-    emale: str
+    email: str
     Image: str
     type : str
     if type:
