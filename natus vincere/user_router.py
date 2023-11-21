@@ -2,13 +2,17 @@ from sqlalchemy.orm import Session
 from typing import List, Annotated
 from fastapi import APIRouter, Depends
 from user import register, create_user
+from sqlalchemy import insert, values, select
 import schemas
 from fastapi import FastAPI, APIRouter, Path
 from schemas import  User
 from fastapi import HTTPException
+from db import engine
 
 user_router = APIRouter(prefix = '/users', tags = ['Пользователи'])
 users =[]
+
+
 
 def get_db():
     db = Session()
@@ -45,12 +49,11 @@ def get_user_by_id(user_id: int):
     raise HTTPException(status_code = 404, detail = 'user not found')
 
 @user_router.get('/get_user_by_username/', name = 'get_user_by_username', response_model = User)
-def get_user_by_username(username: str):
-    result =[]
-    for user in users:
-        if username in user.username:
-            result.append(user)
-    return result
+def get_user_by_name (name: str):
+    sel = select([User]).where(User.c.name.like("%{name}%".format(name=name)))
+    conn = engine.connect()
+    r = conn.execute(sel)
+    return r.fetchone()
 
 @user_router.get('/get_user_by_email/', name = 'get_user_by_email', response_model = User)
 def get_user_by_email(email: str):
@@ -63,9 +66,5 @@ def get_user_by_email(email: str):
 
 @user_router.post("/register_user/", response_model=schemas.User, status_code=201)
 def register_user(user_data: schemas.User, db: Session = Depends(get_db)):
-    return create_user(db=db, user_data=user_data)
-
-
-
-
+    return register(db=db, user_data=user_data)
 
